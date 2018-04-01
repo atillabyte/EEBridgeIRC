@@ -1,0 +1,30 @@
+﻿
+
+      ___                  _             _        ___    _ _ _
+     | __|_ _____ _ _ _  _| |__  ___  __| |_  _  | __|__| (_) |_ ___
+     | _|\ V / -_) '_| || | '_ \/ _ \/ _` | || | | _|/ _` | |  _(_-<
+     |___|\_/\___|_|  \_, |_.__/\___/\__,_|\_, | |___\__,_|_|\__/__/
+                      |__/                 |__/
+                                                            +=+++=+
+                                                            +I+R+C+
+                                                            +=+=+++
+
+
+Welcome, %username%!
+ You have successfully connected to the Everybody Edits IRC bridge.
+ ------------------------------------------------------------------
+
+ Announcements:
+   * April 1st, 2018 by ATILLA:
+        Yay - The server is set up and running now. You can visit
+		      the project homepage at:
+			  https://github.com/atillabyte/irc-bridge-ee :)
+
+
+
+
+
+
+
+
+
