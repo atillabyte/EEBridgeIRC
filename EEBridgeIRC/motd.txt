@@ -18,7 +18,7 @@ Welcome, %username%!
    * April 1st, 2018 by ATILLA:
         Yay - The server is set up and running now. You can visit
 		      the project homepage at:
-			  https://github.com/atillabyte/irc-bridge-ee :)
+			  https://github.com/atillabyte/EEBridgeIRC :)
 
 
 
