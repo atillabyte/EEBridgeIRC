@@ -56,6 +56,13 @@ namespace EEBridgeIrc.Irc
                         if (!RoomName.ContainsKey(client)) // just in case..? ;-;
                             RoomName.Add(client, (string)e[1]);
 
+                        new ChannelTopicReply() {
+                            ChannelName = this.Name,
+                            RecipientNickName = client.NickName,
+                            SenderAddress = Server.HostName,
+                            Topic = $"\"{e[1]}\" by {e[0]} | {e[2]} plays {e[4]} likes {e[3]} favourites."
+                        }.SendMessageToClient(client);
+
                         Connections[client].Send("init2");
                         break;
                     case "add":

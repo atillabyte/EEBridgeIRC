@@ -85,7 +85,7 @@ namespace EEBridgeIrc.Irc
                 return;
 
             client.IsActive = false;
-            Console.WriteLine("User {0} disconnected", NickName);
+            Console.WriteLine("User {0} disconnected.", this.NickName);
         }
 
         private void ProcessClientCommand(NetworkClient client, string command)
