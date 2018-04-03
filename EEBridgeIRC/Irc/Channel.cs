@@ -60,7 +60,7 @@ namespace EEBridgeIrc.Irc
                             ChannelName = this.Name,
                             RecipientNickName = client.NickName,
                             SenderAddress = Server.HostName,
-                            Topic = $"\"{e[1]}\" by {e[0]} | {e[2]} plays {e[4]} likes {e[3]} favourites."
+                            Topic = $"\"{e[1]}\" by [violet]({e[0]}) | {e[2]} [bold, red](plays) {e[4]} [bold, blue](likes) {e[3]} [bold, lightgreen](favourites).".FormatIRC()
                         }.SendMessageToClient(client);
 
                         Connections[client].Send("init2");
@@ -97,14 +97,14 @@ namespace EEBridgeIrc.Irc
                         new PrivateMessageAnnouncement() {
                             SenderMask = string.Format("{0}!~{1}@{2}", "-SYSTEM-", "write", "system.ee"),
                             Recipient = "#" + this.Name,
-                            Message = (string)e[0] + ": " + (string)e[1]
+                            Message = $"4{(string)e[0]}: {(string)e[1]}"
                         }.SendMessageToClient(client);
                         break;
                     case "say_old":
                         new PrivateMessageAnnouncement() {
-                            SenderMask = string.Format("{0}!~{1}@{2}", $"_{e[0]}_", "old-msg", "system.ee"),
+                            SenderMask = string.Format("{0}!~{1}@{2}", $"{e[0]}", "old-msg", "system.ee"),
                             Recipient = "#" + this.Name,
-                            Message = (string)e[1]
+                            Message = $"15{(string)e[1]}"
                         }.SendMessageToClient(client);
                         break;
                     case "updatemeta":
@@ -119,7 +119,7 @@ namespace EEBridgeIrc.Irc
                             ChannelName = this.Name,
                             RecipientNickName = client.NickName,
                             SenderAddress = Server.HostName,
-                            Topic = $"\"{e[1]}\" by {e[0]} | {e[2]} plays {e[4]} likes {e[3]} favourites."
+                            Topic = $"\"{e[1]}\" by [violet]({e[0]}) | {e[2]} [bold, red](plays) {e[4]} [bold, blue](likes) {e[3]} [bold, lightgreen](favourites).".FormatIRC()
                         }.SendMessageToClient(client);
                         break;
                 }
