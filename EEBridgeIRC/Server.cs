@@ -8,6 +8,11 @@ using PlayerIOClient;
 
 namespace EEBridgeIrc
 {
+    public delegate void MessageReceivedDelegate(NetworkClient client, string message);
+    public delegate void ClientDisconnectedDelegate(NetworkClient client);
+    public delegate void IrcCommandReceivedDelegate(IrcClient client, string command);
+    public delegate void UserActivatedDelegate(IrcClient client);
+
     public class Server
     {
         private readonly TcpListener _listener;
@@ -22,7 +27,7 @@ namespace EEBridgeIrc
 
         public bool IsRunning { get; private set; }
 
-        public Server(IPAddress ip, int port)
+        public Server(IPAddress ip, int port, string hostname)
         {
             EEGuestClient = PlayerIO.QuickConnect.SimpleConnect("everybody-edits-su9rn58o40itdbnw69plyw", "guest", "guest", null);
 
@@ -30,14 +35,24 @@ namespace EEBridgeIrc
             _ircClients = new List<IrcClient>();
             _controller = new IrcController(_ircClients);
             _commandProcessor = new IrcCommandProcessor(_controller);
+
+            HostName = hostname;
         }
 
-        public void Run()
+        public void Start()
         {
             _listener.Start();
-            IsRunning = true;
 
+            this.IsRunning = true;
             _clientListenTask = ListenForClients();
+        }
+
+        public void Stop()
+        {
+            _listener.Stop();
+
+            this.IsRunning = false;
+            _clientListenTask = null;
         }
 
         private void ClientConnected(TcpClient client, int clientNumber)

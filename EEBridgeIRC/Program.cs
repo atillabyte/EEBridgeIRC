@@ -1,20 +1,18 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading;
 
 namespace EEBridgeIrc
 {
     internal static class Program
     {
-         private static void Main(string[] args)
-         {
-             var ctx = new SingleThreadSynchronizationContext();
-             SynchronizationContext.SetSynchronizationContext(ctx);
+        private static void Main(string[] args)
+        {
+            var server = new Server(IPAddress.Any, 23000, "localhost");
+                server.Start();
 
-             var server = new Server(IPAddress.Any, 23000);
-             Server.HostName = "localhost";
-             server.Run();
-
-             ctx.RunMessagePump();
-         }
+            Console.WriteLine("EEBridgeIRC started.");
+            Console.ReadLine();
+        }
     }
 }

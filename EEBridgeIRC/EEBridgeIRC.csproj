@@ -45,7 +45,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Delegates.cs" />
     <Compile Include="Irc\Channel.cs" />
     <Compile Include="Irc\Commands\IrcCommandAttribute.cs" />
     <Compile Include="Irc\Commands\IReceivedCommand.cs" />

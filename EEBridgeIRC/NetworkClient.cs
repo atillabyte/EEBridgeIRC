@@ -6,13 +6,12 @@ namespace EEBridgeIrc
 {
     public class NetworkClient
     {
-        private NetworkStream _networkStream;
-
+        public string RemoteAddress { get; }
         public bool IsActive { get; set; }
         public int Id { get; }
         public TcpClient Socket { get; }
+        internal NetworkStream NetworkStream;
         public Task ReceiveInputTask { get; }
-        public string RemoteAddress { get; }
 
         public event MessageReceivedDelegate MessageReceived;
         public event ClientDisconnectedDelegate ClientDisconnected;
@@ -28,9 +27,9 @@ namespace EEBridgeIrc
         public async Task ReceiveInput()
         {
             IsActive = true;
-            _networkStream = this.Socket.GetStream();
+            NetworkStream = this.Socket.GetStream();
 
-            using (var reader = new StreamReader(_networkStream)) {
+            using (var reader = new StreamReader(NetworkStream)) {
                 while (IsActive) {
                     try {
                         var content = await reader.ReadLineAsync();
@@ -57,14 +56,13 @@ namespace EEBridgeIrc
 
         public async Task SendLine(string line)
         {
-            if (!IsActive)
+            if (!this.IsActive)
                 return;
 
             try
             {
-                // Don't use a using statement as we do not want the stream closed
-                //    after the write is completed
-                var writer = new StreamWriter(_networkStream);
+                // don't use a using statement as we do not want the stream closed after the write is completed
+                var writer = new StreamWriter(NetworkStream);
                 await writer.WriteLineAsync(line);
                 writer.Flush();
             }
@@ -76,7 +74,8 @@ namespace EEBridgeIrc
 
         private void MarkAsDisconnected()
         {
-            IsActive = false;
+            this.IsActive = false;
+
             ClientDisconnected?.Invoke(this);
         }
     }
