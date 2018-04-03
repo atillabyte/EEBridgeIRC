@@ -51,66 +51,74 @@ namespace EEBridgeIrc.Irc
             };
 
             Connections[client].OnMessage += (s, e) => {
-                if (e.Type == "init")
-                    Connections[client].Send("init2");
-                else if (e.Type == "add") {
-                    new UserJoinedChannelAnnouncement {
-                        UserMask = string.Format("{0}!~{1}@{2}", e[1], e[1], "world.ee"),
-                        ChannelName = Name
-                    }.SendMessageToClient(client);
+                switch (e.Type) {
+                    case "init":
+                        if (!RoomName.ContainsKey(client)) // just in case..? ;-;
+                            RoomName.Add(client, (string)e[1]);
 
-                    RoomUsernames[client].Add((int)e[0], (string)e[1]);
-                }
-                else if (e.Type == "say") {
-                    var username = RoomUsernames[client][(int)e[0]];
+                        Connections[client].Send("init2");
+                        break;
+                    case "add":
+                        RoomUsernames[client].Add((int)e[0], (string)e[1]);
 
-                    new PrivateMessageAnnouncement() {
-                        SenderMask = string.Format("{0}!~{1}@{2}", username, username, "world.ee"),
-                        Recipient = "#" + this.Name,
-                        Message = (string)e[1]
-                    }.SendMessageToClient(client);
-                }
-                else if (e.Type == "write") {
-                    new PrivateMessageAnnouncement() {
-                        SenderMask = string.Format("{0}!~{1}@{2}", "-SYSTEM-", "write", "system.ee"),
-                        Recipient = "#" + this.Name,
-                        Message = (string)e[0] + ": " + (string)e[1] // todo: bold e[0]
-                    }.SendMessageToClient(client);
-                }
-                else if (e.Type == "say_old") {
-                    new PrivateMessageAnnouncement() {
-                        SenderMask = string.Format("{0}!~{1}@{2}", "_" + (string)e[0] + "_", "old-msg", "system.ee"),
-                        Recipient = "#" + this.Name,
-                        Message = (string)e[1]
-                    }.SendMessageToClient(client);
-                }
-                else if (e.Type == "updatemeta") {
-                    if (!RoomName.ContainsKey(client))
-                        RoomName.Add(client, (string)e[1]);
-                    else {
-                        if (RoomName[client] == (string)e[1])
-                            return;
-                    }
+                        new UserJoinedChannelAnnouncement {
+                            UserMask = string.Format("{0}!~{1}@{2}", e[1], e[1], "world.ee"),
+                            ChannelName = Name
+                        }.SendMessageToClient(client);
+                        break;
+                    case "left": {
+                            var username = RoomUsernames[client][(int)e[0]];
 
-                    new ChannelTopicReply() {
-                        ChannelName = this.Name,
-                        RecipientNickName = client.NickName,
-                        SenderAddress = Server.HostName,
-                        Topic = $"\"{e[1]}\" by {e[0]} | {e[2]} plays {e[4]} likes {e[3]} favourites."
-                    }.SendMessageToClient(client);
-                }
-                else if (e.Type == "left") {
-                    var username = RoomUsernames[client][(int)e[0]];
+                            RoomUsernames[client].Remove((int)e[0]);
+                            new UserPartedChannelAnnouncement() {
+                                SenderMask = string.Format("{0}!~{1}@{2}", username, username, "world.ee"),
+                                ChannelName = this.Name
+                            }.SendMessageToClient(client);
+                        }
+                        break;
+                    case "say": {
+                            var username = RoomUsernames[client][(int)e[0]];
 
-                    RoomUsernames[client].Remove((int)e[0]);
-                    new UserPartedChannelAnnouncement() {
-                        SenderMask = string.Format("{0}!~{1}@{2}", username, username, "world.ee"),
-                        ChannelName = this.Name
-                    }.SendMessageToClient(client);
+                            new PrivateMessageAnnouncement() {
+                                SenderMask = string.Format("{0}!~{1}@{2}", username, username, "world.ee"),
+                                Recipient = "#" + this.Name,
+                                Message = (string)e[1]
+                            }.SendMessageToClient(client);
+                        }
+                        break;
+                    case "write":
+                        new PrivateMessageAnnouncement() {
+                            SenderMask = string.Format("{0}!~{1}@{2}", "-SYSTEM-", "write", "system.ee"),
+                            Recipient = "#" + this.Name,
+                            Message = (string)e[0] + ": " + (string)e[1]
+                        }.SendMessageToClient(client);
+                        break;
+                    case "say_old":
+                        new PrivateMessageAnnouncement() {
+                            SenderMask = string.Format("{0}!~{1}@{2}", $"_{e[0]}_", "old-msg", "system.ee"),
+                            Recipient = "#" + this.Name,
+                            Message = (string)e[1]
+                        }.SendMessageToClient(client);
+                        break;
+                    case "updatemeta":
+                        if (RoomName.ContainsKey(client) && RoomName[client] == (string)e[1])
+                            break;
+
+                        if (!RoomName.ContainsKey(client))
+                             RoomName.Add(client, (string)e[1]);
+                        else RoomName[client] = (string)e[1];
+
+                        new ChannelTopicReply() {
+                            ChannelName = this.Name,
+                            RecipientNickName = client.NickName,
+                            SenderAddress = Server.HostName,
+                            Topic = $"\"{e[1]}\" by {e[0]} | {e[2]} plays {e[4]} likes {e[3]} favourites."
+                        }.SendMessageToClient(client);
+                        break;
                 }
             };
 
-            // Announce the join to all clients in the channel
+            // announce the join to all clients in the channel
             foreach (var channelClient in _clients)
             {
                 new UserJoinedChannelAnnouncement
