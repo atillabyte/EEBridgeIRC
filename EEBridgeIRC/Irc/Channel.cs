@@ -60,7 +60,7 @@ namespace EEBridgeIrc.Irc
                             ChannelName = this.Name,
                             RecipientNickName = client.NickName,
                             SenderAddress = Server.HostName,
-                            Topic = $"\"{e[1]}\" by [violet]({e[0]}) | {e[2]} [bold, red](plays) {e[4]} [bold, blue](likes) {e[3]} [bold, lightgreen](favourites).".FormatIRC()
+                            Topic = $"\"{e[1]}\" by [violet]({e[0]}) | [violet]({e[2]}) [bold, red](plays), [violet]({e[4]}) [bold, blue](likes), [violet]({e[3]}) [bold, lightgreen](favourites).".FormatIRC()
                         }.SendMessageToClient(client);
 
                         Connections[client].Send("init2");
@@ -119,7 +119,7 @@ namespace EEBridgeIrc.Irc
                             ChannelName = this.Name,
                             RecipientNickName = client.NickName,
                             SenderAddress = Server.HostName,
-                            Topic = $"\"{e[1]}\" by [violet]({e[0]}) | {e[2]} [bold, red](plays) {e[4]} [bold, blue](likes) {e[3]} [bold, lightgreen](favourites).".FormatIRC()
+                            Topic = $"\"{e[1]}\" by [violet]({e[0]}) | [violet]({e[2]}) [bold, red](plays), [violet]({e[4]}) [bold, blue](likes), [violet]({e[3]}) [bold, lightgreen](favourites).".FormatIRC()
                         }.SendMessageToClient(client);
                         break;
                 }
