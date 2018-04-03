@@ -125,6 +125,27 @@ namespace EEBridgeIrc.Irc
                 }
             };
 
+            // announce the join to all clients in the channel
+            foreach (var channelClient in _clients) {
+                new UserJoinedChannelAnnouncement {
+                    UserMask = client.UserMask,
+                    ChannelName = Name
+                }.SendMessageToClient(channelClient);
+            }
+
+            new ChannelUserListReply {
+                SenderAddress = Server.HostName,
+                RecipientNickName = client.NickName,
+                ChannelName = this.Name,
+                Users = _clients.Where(x => x != client).Select(x => x.NickName).ToArray()
+            }.SendMessageToClient(client);
+
+            new ChanneluserListEndReply() {
+                SenderAddress = Server.HostName,
+                ClientNick = client.NickName,
+                ChannelName = Name
+            }.SendMessageToClient(client);
+
             Connections[client].Send("init");
         }
 
