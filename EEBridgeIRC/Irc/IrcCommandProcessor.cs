@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 using System.Linq;
+using System.Reflection;
+using System.Collections.Generic;
 using EEBridgeIrc.Irc.Commands;
 
 namespace EEBridgeIrc.Irc

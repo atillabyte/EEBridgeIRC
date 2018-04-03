@@ -1,30 +1,24 @@
-﻿
-
-      ___                  _             _        ___    _ _ _
-     | __|_ _____ _ _ _  _| |__  ___  __| |_  _  | __|__| (_) |_ ___
-     | _|\ V / -_) '_| || | '_ \/ _ \/ _` | || | | _|/ _` | |  _(_-<
-     |___|\_/\___|_|  \_, |_.__/\___/\__,_|\_, | |___\__,_|_|\__/__/
-                      |__/                 |__/
+﻿[bold, yellow](      ___                  _             _        ___    _ _ _       )
+[bold, yellow](     | __|_ _____ _ _ _  _| |__  ___  __| |_  _  | __|__| (_} |_ ___ )
+[bold, yellow](     | _|\ V / -_} '_| || | '_ \/ _ \/ _` | || | | _|/ _` | |  _(_-< )
+[bold, yellow](     |___|\_/\___|_|  \_, |_.__/\___/\__,_|\_, | |___\__,_|_|\__/__/ )
+[bold, yellow](                      |__/                 |__/						)
                                                             +=+++=+
                                                             +I+R+C+
                                                             +=+=+++
 
 
-Welcome, %username%!
- You have successfully connected to the Everybody Edits IRC bridge.
+Welcome, [bold, yellow](%username%)!
+ You have successfully connected to the [italics](Everybody Edits) IRC bridge.
  ------------------------------------------------------------------
 
- Announcements:
-   * April 1st, 2018 by ATILLA:
-        Yay - The server is set up and running now. You can visit
+ [bold, red](Announcements):
+   * [underline, lightgrey](April 3rd, 2018) by [bold, blue](ATILLA):
+		[bold, green](So far, so good) - The server now has support for color motd
+						  as one can likely tell by now! Still need
+						  to add support for modes, though. :)
+   * [underline, lightgrey](April 1st, 2018) by [bold, blue](ATILLA):
+        [bold, green](Yay) - The server is set up and running now. You can visit
 		      the project homepage at:
 			  https://github.com/atillabyte/EEBridgeIRC :)
-
-
-
-
-
-
-
-
 

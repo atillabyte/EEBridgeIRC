@@ -71,6 +71,7 @@
     <Compile Include="Irc\Commands\Sent\Replies\ChannelUserListReply.cs" />
     <Compile Include="Irc\Commands\Sent\Replies\WelcomeReply.cs" />
     <Compile Include="Irc\Commands\Sent\SentCommandExtensions.cs" />
+    <Compile Include="Irc\Helpers\IRCFormatter.cs" />
     <Compile Include="Irc\IrcClient.cs" />
     <Compile Include="Irc\IrcCommandProcessor.cs" />
     <Compile Include="Irc\IrcController.cs" />

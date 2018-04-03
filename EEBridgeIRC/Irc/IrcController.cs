@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.IO;
+using System.Collections.Generic;
 using EEBridgeIrc.Irc.Commands.Sent;
 using EEBridgeIrc.Irc.Commands.Sent.Announcements;
 using EEBridgeIrc.Irc.Commands.Sent.Errors;
@@ -32,7 +32,8 @@ namespace EEBridgeIrc.Irc
         {
             var message = new WelcomeReply
             {
-                Message = File.Exists("motd.txt") ? File.ReadAllText("motd.txt").Replace("%username%", client.UserName) : "Welcome to the Everybody Edits IRC Bridge!",
+                Message = File.Exists("motd.txt") ? File.ReadAllText("motd.txt").FormatIRC().Replace("%username%", client.UserName)
+                                                  : "Welcome to the Everybody Edits IRC Bridge!",
                 SenderAddress = Server.HostName,
                 SenderNickName = client.NickName
             }.FormFullResponseString();
@@ -54,7 +55,6 @@ namespace EEBridgeIrc.Irc
                 }.FormFullResponseString();
 
                 sender.SendMessage(errorMessage);
-
                 return;
             }
 
@@ -73,9 +73,8 @@ namespace EEBridgeIrc.Irc
 
         public void JoinChannel(IrcClient client, string channelName)
         {
-            // If the channel doesn't exist yet, create it
-            var channel =
-                _channels.Find(x => x.Name.Equals(channelName, StringComparison.InvariantCultureIgnoreCase));
+            // if the channel doesn't exist yet, create it
+            var channel = _channels.Find(x => x.Name.Equals(channelName, StringComparison.InvariantCultureIgnoreCase));
 
             if (channel == null)
             {
@@ -88,8 +87,7 @@ namespace EEBridgeIrc.Irc
 
         public void PartChannel(IrcClient client, string channelName)
         {
-            var channel =
-                _channels.Find(x => x.Name.Equals(channelName, StringComparison.InvariantCultureIgnoreCase));
+            var channel = _channels.Find(x => x.Name.Equals(channelName, StringComparison.InvariantCultureIgnoreCase));
 
             if (channel == null)
                 return;
@@ -104,14 +102,12 @@ namespace EEBridgeIrc.Irc
 
         public void SendMessageToChannel(IrcClient sender, string channelName, string message)
         {
-            var channel =
-                _channels.Find(x => x.Name.Equals(channelName, StringComparison.InvariantCultureIgnoreCase));
+            var channel = _channels.Find(x => x.Name.Equals(channelName, StringComparison.InvariantCultureIgnoreCase));
 
             if (channel == null)
                 return;
 
             channel.Connections[sender].Send("say", message);
-            //channel.BroadcastMessage(sender, message);
         }
     }
 }
