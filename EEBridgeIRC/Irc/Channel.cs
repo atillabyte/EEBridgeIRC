@@ -47,7 +47,12 @@ namespace EEBridgeIrc.Irc
             RoomUsernames.Add(client, new Dictionary<int, string>());
 
             Connections[client].OnDisconnect += (s, e) => {
-                client.Disconnect();
+                // temporary solution
+                new PrivateMessageAnnouncement() {
+                            SenderMask = string.Format("{0}!~{1}@{2}", "-EEBridgeIRC-", "bridge", "system.irc"),
+                            Recipient = "#" + this.Name,
+                            Message = $"4You have disconnected from the room."
+                }.SendMessageToClient(client);
             };
 
             Connections[client].OnMessage += (s, e) => {
