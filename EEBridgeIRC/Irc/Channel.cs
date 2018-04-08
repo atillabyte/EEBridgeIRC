@@ -127,6 +127,13 @@ namespace EEBridgeIrc.Irc
                             Topic = $"\"{e[1]}\" by [violet]({e[0]}) | [violet]({e[2]}) [bold, red](plays), [violet]({e[4]}) [bold, blue](likes), [violet]({e[3]}) [bold, lightgreen](favourites).".FormatIRC()
                         }.SendMessageToClient(client);
                         break;
+                    case "clear":
+                        new PrivateMessageAnnouncement() {
+                            SenderMask = string.Format("{0}!~{1}@{2}", "-SYSTEM-", "clear", "system.ee"),
+                            Recipient = "#" + this.Name,
+                            Message = $"4* SYSTEM: The world has been cleared."
+                        }.SendMessageToClient(client);
+                        break;
                 }
             };
 

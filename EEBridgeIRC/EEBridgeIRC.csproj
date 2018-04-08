@@ -55,6 +55,7 @@
     <Compile Include="Irc\Commands\Received\PassCommand.cs" />
     <Compile Include="Irc\Commands\Received\PrivateMessageCommand.cs" />
     <Compile Include="Irc\Commands\Received\UserCommand.cs" />
+    <Compile Include="Irc\Commands\Received\EverybodyEditsCommand.cs" />
     <Compile Include="Irc\Commands\Sent\Announcements\PrivateMessageAnnouncement.cs" />
     <Compile Include="Irc\Commands\Sent\Announcements\UserJoinedChannelAnnouncement.cs" />
     <Compile Include="Irc\Commands\Sent\Announcements\UserPartedChannelAnnouncement.cs" />
