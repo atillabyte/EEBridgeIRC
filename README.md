@@ -8,7 +8,11 @@
                                                             +=+=+++
 
 ## Preview
-![Screenshot Preview](https://i.imgur.com/5DwNi3d.png)
+### Windows
+![Windows Screenshot Preview](https://i.imgur.com/5DwNi3d.png)
+
+### Linux
+![Linux Screenshot Preview](https://i.imgur.com/CKwNUpE.png)
 
 ## Demonstration
 ###### note: this server has no uptime guarantee - may be down periodically
