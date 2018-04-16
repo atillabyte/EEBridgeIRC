@@ -33,7 +33,7 @@ namespace EEBridgeIrc.Irc.Commands.Received
                 return;
             }
             
-            target.Connections[client].Send("say", $"/{command} {extra}");
+            target.Connections.First(t => t.IrcClient == client).Connection.Send("say", $"/{command} {extra}");
         }
     }
 }

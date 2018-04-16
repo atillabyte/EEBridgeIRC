@@ -7,20 +7,143 @@ using PlayerIOClient;
 
 namespace EEBridgeIrc.Irc
 {
+    public class ClientWorld
+    {
+        public Channel IrcChannel { get; set; }
+        public IrcClient IrcClient { get; set; }
+        public Connection Connection { get; set; }
+        public string RoomName { get; set; }
+        public string OwnerName { get; set; }
+
+        public List<ClientWorldPlayer> Players = new List<ClientWorldPlayer>();
+
+        public ClientWorld(Channel channel, IrcClient client, Connection connection)
+        {
+            this.IrcChannel = channel;
+            this.IrcClient = client;
+            this.Connection = connection;
+
+            this.Connection.OnDisconnect += (s, e) => {
+                new PrivateMessageAnnouncement() {
+                            SenderMask = string.Format("{0}!~{1}@{2}", "-EEBridgeIRC-", "bridge", "system.irc"),
+                            Recipient = "#" + this.IrcChannel.Name,
+                            Message = $"4You have disconnected from the room."
+                }.SendMessageToClient(this.IrcClient);
+            };
+
+            this.Connection.OnMessage += (s, e) => {
+                switch (e.Type) {
+                    case "init":
+                        this.OwnerName = (string)e[0];
+                        this.RoomName = (string)e[1];
+
+                        new ChannelTopicReply() {
+                            ChannelName = this.IrcChannel.Name,
+                            RecipientNickName = this.IrcClient.NickName,
+                            SenderAddress = Server.HostName,
+                            Topic = $"\"{e[1]}\" by [violet]({e[0]}) | [violet]({e[2]}) [bold, red](plays), [violet]({e[4]}) [bold, blue](likes), [violet]({e[3]}) [bold, lightgreen](favourites).".FormatIRC()
+                        }.SendMessageToClient(this.IrcClient);
+
+                        this.Connection.Send("init2");
+                        break;
+                    case "add": {
+                            // If the xuser already exists within the list of players, retrieve them.
+                            // and update their relevant properties. Otherwise, add them to the list.
+                            var player = this.Players.Find(p => p.ConnectUserId == (string)e[2]);
+                            if (player != null)
+                                player.Id = (int)e[0];
+                            else this.Players.Add(new ClientWorldPlayer() {
+                                Id = (int)e[0],
+                                Username = (string)e[1],
+                                ConnectUserId = (string)e[2],
+
+                                IsFriend = (bool)e[12],
+                                CanEdit = (bool)e[24]
+                            });
+
+                            new UserJoinedChannelAnnouncement {
+                                UserMask = string.Format("{0}!~{1}@{2}", e[1], e[1], "world.ee"),
+                                ChannelName = this.IrcChannel.Name
+                            }.SendMessageToClient(this.IrcClient);
+                        }
+                        break;
+                    case "left": {
+                            var player = this.Players.Find(p => p.Id == (int)e[0]);
+
+                            new UserPartedChannelAnnouncement() {
+                                SenderMask = string.Format("{0}!~{1}@{2}", player.Username, player.Username, "world.ee"),
+                                ChannelName = this.IrcChannel.Name
+                            }.SendMessageToClient(this.IrcClient);
+
+                            this.Players.Remove(player);
+                        }
+                        break;
+                    case "say": {
+                            var player = this.Players.Find(p => p.Id == (int)e[0]);
+
+                            new PrivateMessageAnnouncement() {
+                                SenderMask = string.Format("{0}!~{1}@{2}", player.Username, player.Username, "world.ee"),
+                                Recipient = "#" + this.IrcChannel.Name,
+                                Message = (string)e[1]
+                            }.SendMessageToClient(this.IrcClient);
+                        }
+                        break;
+                    case "write":
+                        new PrivateMessageAnnouncement() {
+                            SenderMask = string.Format("{0}!~{1}@{2}", "-SYSTEM-", "write", "system.ee"),
+                            Recipient = "#" + this.IrcChannel.Name,
+                            Message = $"4{(string)e[0]}: {(string)e[1]}"
+                        }.SendMessageToClient(this.IrcClient);
+                        break;
+                    case "say_old":
+                        new PrivateMessageAnnouncement() {
+                            SenderMask = string.Format("{0}!~{1}@{2}", $"{e[0]}", "old-msg", "system.ee"),
+                            Recipient = "#" + this.IrcChannel.Name,
+                            Message = $"15{(string)e[1]}"
+                        }.SendMessageToClient(this.IrcClient);
+                        break;
+                    case "updatemeta":
+                        if (this.RoomName != (string)e[1]) {
+                            this.RoomName = (string)e[1];
+
+                            new ChannelTopicReply() {
+                                ChannelName = this.IrcChannel.Name,
+                                RecipientNickName = this.IrcClient.NickName,
+                                SenderAddress = Server.HostName,
+                                Topic = $"\"{e[1]}\" by [violet]({e[0]}) | [violet]({e[2]}) [bold, red](plays), [violet]({e[4]}) [bold, blue](likes), [violet]({e[3]}) [bold, lightgreen](favourites).".FormatIRC()
+                            }.SendMessageToClient(this.IrcClient);
+                        }
+                        break;
+                    case "clear":
+                        new PrivateMessageAnnouncement() {
+                            SenderMask = string.Format("{0}!~{1}@{2}", "-SYSTEM-", "clear", "system.ee"),
+                            Recipient = "#" + this.IrcChannel.Name,
+                            Message = $"4* SYSTEM: The world has been cleared."
+                        }.SendMessageToClient(this.IrcClient);
+                        break;
+                }
+            };
+
+        }
+    }
+
+    public class ClientWorldPlayer
+    {
+        public int Id { get; set; }
+        public string ConnectUserId { get; set; }
+        public string Username { get; set; }
+
+        public bool IsFriend { get; set; }
+        public bool CanEdit { get; set; }
+    }
+
     public class Channel
     {
         private readonly List<IrcClient> _clients;
 
         public IEnumerable<IrcClient> Clients => _clients;
 
-        public Dictionary<IrcClient, Connection> Connections =
-            new Dictionary<IrcClient, Connection>();
-
-        public Dictionary<IrcClient, Dictionary<int, string>> RoomUsernames =
-            new Dictionary<IrcClient, Dictionary<int, string>>();
-
-        public Dictionary<IrcClient, string> RoomName =
-            new Dictionary<IrcClient, string>();
+        public List<ClientWorld> Connections = new List<ClientWorld>();
 
         public int UserCount => _clients.Count;
 
@@ -42,100 +165,8 @@ namespace EEBridgeIrc.Irc
 
             _clients.Add(client);
 
-            Connections[client] = client._client.Multiplayer.CreateJoinRoom(this.Name,
-                    "Everybodyedits" + client._client.BigDB.Load("config", "config")["version"], true, null, null);
-            RoomUsernames.Add(client, new Dictionary<int, string>());
-
-            Connections[client].OnDisconnect += (s, e) => {
-                // temporary solution
-                new PrivateMessageAnnouncement() {
-                            SenderMask = string.Format("{0}!~{1}@{2}", "-EEBridgeIRC-", "bridge", "system.irc"),
-                            Recipient = "#" + this.Name,
-                            Message = $"4You have disconnected from the room."
-                }.SendMessageToClient(client);
-            };
-
-            Connections[client].OnMessage += (s, e) => {
-                switch (e.Type) {
-                    case "init":
-                        if (!RoomName.ContainsKey(client)) // just in case..? ;-;
-                            RoomName.Add(client, (string)e[1]);
-
-                        new ChannelTopicReply() {
-                            ChannelName = this.Name,
-                            RecipientNickName = client.NickName,
-                            SenderAddress = Server.HostName,
-                            Topic = $"\"{e[1]}\" by [violet]({e[0]}) | [violet]({e[2]}) [bold, red](plays), [violet]({e[4]}) [bold, blue](likes), [violet]({e[3]}) [bold, lightgreen](favourites).".FormatIRC()
-                        }.SendMessageToClient(client);
-
-                        Connections[client].Send("init2");
-                        break;
-                    case "add":
-                        RoomUsernames[client].Add((int)e[0], (string)e[1]);
-
-                        new UserJoinedChannelAnnouncement {
-                            UserMask = string.Format("{0}!~{1}@{2}", e[1], e[1], "world.ee"),
-                            ChannelName = Name
-                        }.SendMessageToClient(client);
-                        break;
-                    case "left": {
-                            var username = RoomUsernames[client][(int)e[0]];
-
-                            RoomUsernames[client].Remove((int)e[0]);
-                            new UserPartedChannelAnnouncement() {
-                                SenderMask = string.Format("{0}!~{1}@{2}", username, username, "world.ee"),
-                                ChannelName = this.Name
-                            }.SendMessageToClient(client);
-                        }
-                        break;
-                    case "say": {
-                            var username = RoomUsernames[client][(int)e[0]];
-
-                            new PrivateMessageAnnouncement() {
-                                SenderMask = string.Format("{0}!~{1}@{2}", username, username, "world.ee"),
-                                Recipient = "#" + this.Name,
-                                Message = (string)e[1]
-                            }.SendMessageToClient(client);
-                        }
-                        break;
-                    case "write":
-                        new PrivateMessageAnnouncement() {
-                            SenderMask = string.Format("{0}!~{1}@{2}", "-SYSTEM-", "write", "system.ee"),
-                            Recipient = "#" + this.Name,
-                            Message = $"4{(string)e[0]}: {(string)e[1]}"
-                        }.SendMessageToClient(client);
-                        break;
-                    case "say_old":
-                        new PrivateMessageAnnouncement() {
-                            SenderMask = string.Format("{0}!~{1}@{2}", $"{e[0]}", "old-msg", "system.ee"),
-                            Recipient = "#" + this.Name,
-                            Message = $"15{(string)e[1]}"
-                        }.SendMessageToClient(client);
-                        break;
-                    case "updatemeta":
-                        if (RoomName.ContainsKey(client) && RoomName[client] == (string)e[1])
-                            break;
-
-                        if (!RoomName.ContainsKey(client))
-                            RoomName.Add(client, (string)e[1]);
-                        else RoomName[client] = (string)e[1];
-
-                        new ChannelTopicReply() {
-                            ChannelName = this.Name,
-                            RecipientNickName = client.NickName,
-                            SenderAddress = Server.HostName,
-                            Topic = $"\"{e[1]}\" by [violet]({e[0]}) | [violet]({e[2]}) [bold, red](plays), [violet]({e[4]}) [bold, blue](likes), [violet]({e[3]}) [bold, lightgreen](favourites).".FormatIRC()
-                        }.SendMessageToClient(client);
-                        break;
-                    case "clear":
-                        new PrivateMessageAnnouncement() {
-                            SenderMask = string.Format("{0}!~{1}@{2}", "-SYSTEM-", "clear", "system.ee"),
-                            Recipient = "#" + this.Name,
-                            Message = $"4* SYSTEM: The world has been cleared."
-                        }.SendMessageToClient(client);
-                        break;
-                }
-            };
+            this.Connections.Add(new ClientWorld(this, client, client._client.Multiplayer.CreateJoinRoom(
+                    this.Name, "Everybodyedits" + client._client.BigDB.Load("config", "config")["version"], true, null, null)));
 
             // announce the join to all clients in the channel
             foreach (var channelClient in _clients) {
@@ -158,7 +189,7 @@ namespace EEBridgeIrc.Irc
                 ChannelName = Name
             }.SendMessageToClient(client);
 
-            Connections[client].Send("init");
+            this.Connections.First(x => x.IrcClient == client).Connection.Send("init");
         }
 
         public void PartClient(IrcClient client)

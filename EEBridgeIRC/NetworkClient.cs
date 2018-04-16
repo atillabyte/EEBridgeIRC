@@ -34,7 +34,7 @@ namespace EEBridgeIrc
                     try {
                         var content = await reader.ReadLineAsync();
 
-                        // If content is null, that means the connection has been gracefully disconnected
+                        // if content is null, that means the connection has been gracefully disconnected
                         if (content == null) {
                             MarkAsDisconnected();
 
@@ -44,7 +44,7 @@ namespace EEBridgeIrc
                         MessageReceived?.Invoke(this, content);
                     }
 
-                    // If the tcp connection is ungracefully disconnected, it will throw an exception
+                    // if the tcp connection is ungracefully disconnected, it will throw an exception
                     catch (IOException) {
                         MarkAsDisconnected();
 

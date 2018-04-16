@@ -92,12 +92,8 @@ namespace EEBridgeIrc.Irc
             if (channel == null)
                 return;
 
-            channel.Connections[client].Disconnect();
+            channel.Connections.First(t => t.IrcClient == client).Connection.Disconnect();
             channel.PartClient(client);
-
-            // fully dispose
-            channel.RoomUsernames.Remove(client);
-            channel.RoomName.Remove(client);
         }
 
         public void SendMessageToChannel(IrcClient sender, string channelName, string message)
@@ -107,7 +103,7 @@ namespace EEBridgeIrc.Irc
             if (channel == null)
                 return;
 
-            channel.Connections[sender].Send("say", message);
+            channel.Connections.First(t => t.IrcClient == sender).Connection.Send("say", message);
         }
     }
 }
