@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -21,6 +22,8 @@ namespace EEBridgeIrc
         private readonly IrcController _controller;
         private Task _clientListenTask;
 
+        public static List<string> EEStaff { get; set; } = new List<string>();
+
         public static Client EEGuestClient { get; internal set; }
 
         public static string HostName { get; internal set; }
@@ -30,6 +33,7 @@ namespace EEBridgeIrc
         public Server(IPAddress ip, int port, string hostname)
         {
             EEGuestClient = PlayerIO.QuickConnect.SimpleConnect("everybody-edits-su9rn58o40itdbnw69plyw", "guest", "guest", null);
+            EEStaff = EEGuestClient.BigDB.Load("config", "staff").Properties.Select(p => p.ToLower()).ToList();
 
             _listener = new TcpListener(ip, port);
             _ircClients = new List<IrcClient>();

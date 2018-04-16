@@ -52,17 +52,27 @@ namespace EEBridgeIrc.Irc
                             var player = this.Players.Find(p => p.ConnectUserId == (string)e[2]);
                             if (player != null)
                                 player.Id = (int)e[0];
-                            else this.Players.Add(new ClientWorldPlayer() {
-                                Id = (int)e[0],
-                                Username = (string)e[1],
-                                ConnectUserId = (string)e[2],
+                            else { 
+                                player = new ClientWorldPlayer() {
+                                    Id = (int)e[0],
+                                    Username = (string)e[1],
+                                    ConnectUserId = (string)e[2],
 
-                                IsFriend = (bool)e[12],
-                                CanEdit = (bool)e[24]
-                            });
+                                    IsFriend = (bool)e[12],
+                                    CanEdit = (bool)e[24]
+                                };
+
+                                this.Players.Add(player);
+                            }
+
+                            var permission = this.OwnerName == player.Username ? "@" :
+                                             player.CanEdit ? "%" :
+                                             player.IsFriend ? "+" :
+                                             player.IsStaff() ? "&" :
+                                             player.IsLocalAdmin() ? "~" : "";
 
                             new UserJoinedChannelAnnouncement {
-                                UserMask = string.Format("{0}!~{1}@{2}", e[1], e[1], "world.ee"),
+                                UserMask = string.Format("{0}{1}!~{2}@{3}", permission, e[1], e[1], "world.ee"),
                                 ChannelName = this.IrcChannel.Name
                             }.SendMessageToClient(this.IrcClient);
                         }
@@ -121,9 +131,39 @@ namespace EEBridgeIrc.Irc
                             Message = $"4* SYSTEM: The world has been cleared."
                         }.SendMessageToClient(this.IrcClient);
                         break;
+                    case "editRights":  {
+                        var player = this.Players.Find(p => p.Id == (int)e[0]);
+
+                        if (player.CanEdit == (bool)e[1])
+                            break;
+
+                        player.CanEdit = (bool)e[1];
+                        
+                        new UserModeAnnouncement {
+                            SenderMask = string.Format("{0}!~{1}@{2}", "-SYSTEM-", "mode", "system.ee"),
+                            Channel = "#" + this.IrcChannel.Name,
+                            Permission = player.CanEdit ? "+h" : "-h",
+                            Recipient = player.Username
+                        }.SendMessageToClient(this.IrcClient);
+                    } break;
+                    case "access":
+                        new UserModeAnnouncement {
+                            SenderMask = string.Format("{0}!~{1}@{2}", "-SYSTEM-", "mode", "system.ee"),
+                            Channel = "#" + this.IrcChannel.Name,
+                            Permission = "+h",
+                            Recipient = this.IrcClient.NickName
+                        }.SendMessageToClient(this.IrcClient);
+                        break;
+                    case "lostaccess":
+                        new UserModeAnnouncement {
+                            SenderMask = string.Format("{0}!~{1}@{2}", "-SYSTEM-", "mode", "system.ee"),
+                            Channel = "#" + this.IrcChannel.Name,
+                            Permission = "-h",
+                            Recipient = this.IrcClient.NickName
+                        }.SendMessageToClient(this.IrcClient);
+                        break;
                 }
             };
-
         }
     }
 
@@ -135,6 +175,9 @@ namespace EEBridgeIrc.Irc
 
         public bool IsFriend { get; set; }
         public bool CanEdit { get; set; }
+
+        public bool IsStaff() => Server.EEStaff.Any(p => p == Username.ToLower());
+        public bool IsLocalAdmin() => new List<string> { "atilla" }.Any(p => p == Username.ToLower());
     }
 
     public class Channel
@@ -183,7 +226,7 @@ namespace EEBridgeIrc.Irc
                 Users = _clients.Where(x => x != client).Select(x => x.NickName).ToArray()
             }.SendMessageToClient(client);
 
-            new ChanneluserListEndReply() {
+            new ChannelUserListEndReply() {
                 SenderAddress = Server.HostName,
                 ClientNick = client.NickName,
                 ChannelName = Name

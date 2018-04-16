@@ -30,9 +30,12 @@ namespace EEBridgeIrc.Irc
 
         public void SendActivationMessages(IrcClient client)
         {
+            var motd_file_path = Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location),
+                                 "motd.txt");
+
             var message = new WelcomeReply
             {
-                Message = File.Exists("motd.txt") ? File.ReadAllText("motd.txt").FormatIRC().Replace("%username%", client.UserName)
+                Message = File.Exists(motd_file_path) ? File.ReadAllText(motd_file_path).FormatIRC().Replace("%username%", client.UserName)
                                                   : "Welcome to the Everybody Edits IRC Bridge!",
                 SenderAddress = Server.HostName,
                 SenderNickName = client.NickName

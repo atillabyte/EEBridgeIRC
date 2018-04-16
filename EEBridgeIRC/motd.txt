@@ -9,15 +9,16 @@
 
 
 Welcome, [bold, yellow](%username%)!
- You have successfully connected to the [italics](Everybody Edits) IRC bridge.
+ You have successfully connected to the Everybody Edits IRC bridge.
  ------------------------------------------------------------------
 
  [bold, red](Announcements):
-   * [underline, lightgrey](April 3rd, 2018) by [bold, blue](ATILLA):
+   * [underline, blue](April 16th, 2018) by [bold, blue](ATILLA):
+        [bold, lightgreen](We support MODE now!) - The server now has support for user
+        modes. You can now see the owner, staff, and whoever has edit permissions.
+   * [underline, blue](April 3rd, 2018) by [bold, blue](ATILLA):
         [bold, lightgreen](So far, so good) - The server now has support for color motd
-						  as one can likely tell by now! Still need
-						  to add support for modes, though. :)
-   * [underline, lightgrey](April 1st, 2018) by [bold, blue](ATILLA):
-        [bold, lightgreen](Yay) - The server is set up and running now. You can visit
-		      the project homepage at:
-			  https://github.com/atillabyte/EEBridgeIRC :)
+        as one can likely tell by now! Still need to add support for modes, though. :)
+   * [underline, blue](April 1st, 2018) by [bold, blue](ATILLA):
+        [bold, lightgreen](Yay) - The server is set up and running now.
+        You can visit the project repository at: https://github.com/atillabyte/EEBridgeIRC :)

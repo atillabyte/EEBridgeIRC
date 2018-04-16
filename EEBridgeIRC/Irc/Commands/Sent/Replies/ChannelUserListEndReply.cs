@@ -1,6 +1,6 @@
 ﻿namespace EEBridgeIrc.Irc.Commands.Sent.Replies
 {
-    public class ChanneluserListEndReply : ISentCommand
+    public class ChannelUserListEndReply : ISentCommand
     {
         private const int ResponseCode = 366;
         private const string Message = "End of /NAMES list.";

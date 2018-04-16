@@ -59,6 +59,7 @@
     <Compile Include="Irc\Commands\Sent\Announcements\PrivateMessageAnnouncement.cs" />
     <Compile Include="Irc\Commands\Sent\Announcements\UserJoinedChannelAnnouncement.cs" />
     <Compile Include="Irc\Commands\Sent\Announcements\UserPartedChannelAnnouncement.cs" />
+    <Compile Include="Irc\Commands\Sent\Announcements\UserModeAnnouncement.cs" />
     <Compile Include="Irc\Commands\Sent\Errors\NeedMoreParamsError.cs" />
     <Compile Include="Irc\Commands\Sent\Errors\NicknameInUseError.cs" />
     <Compile Include="Irc\Commands\Sent\Errors\NoSuchChannelError.cs" />
@@ -68,7 +69,7 @@
     <Compile Include="Irc\Commands\Sent\Replies\ChannelListEndReply.cs" />
     <Compile Include="Irc\Commands\Sent\Replies\ChannelListReply.cs" />
     <Compile Include="Irc\Commands\Sent\Replies\ChannelTopicReply.cs" />
-    <Compile Include="Irc\Commands\Sent\Replies\ChanneluserListEndReply.cs" />
+    <Compile Include="Irc\Commands\Sent\Replies\ChannelUserListEndReply.cs" />
     <Compile Include="Irc\Commands\Sent\Replies\ChannelUserListReply.cs" />
     <Compile Include="Irc\Commands\Sent\Replies\WelcomeReply.cs" />
     <Compile Include="Irc\Commands\Sent\SentCommandExtensions.cs" />
